@@ -1,0 +1,42 @@
+galera-seed:
+  image: jakolehm/galera-mariadb-10.0-xtrabackup:latest
+  stateful: true
+  command: seed
+  env_file: galera-seed.env
+
+galera:
+  image: jakolehm/galera-mariadb-10.0-xtrabackup:latest
+  stateful: true
+  instances: 3
+  command: "node %{project}-galera-seed-1.kontena.local,%{project}-galera.kontena.local"
+  env_file: galera.env
+  links:
+    - galera-ha
+  environment:
+    - KONTENA_LB_MODE=tcp
+    - KONTENA_LB_BALANCE=roundrobin
+    - KONTENA_LB_INTERNAL_PORT=3306
+    - KONTENA_LB_EXTERNAL_PORT=3306
+
+galera-ha:
+  image: kontena/lb:latest
+  instances: 2
+
+dwserver:
+  image: wikman/dropwizard-example:1.0
+  stateful: false
+  instances: 2
+  links:
+    - dwserver-ha
+  environment:
+    - KONTENA_LB_MODE=http
+    - KONTENA_LB_BALANCE=source
+    - KONTENA_LB_INTERNAL_PORT=80
+    - KONTENA_LB_EXTERNAL_PORT=80
+    - DWSERVER_DB_HOST=%{project}-galera-ha.kontena.local
+
+dwserver-ha:
+  image: kontena/lb:latest
+  instances: 2
+  ports:
+  - "8080:8080"
