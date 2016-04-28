@@ -15,7 +15,7 @@ database:
   password: secretpassword
 
   # the JDBC URL
-  url: jdbc:mysql://kontena-dropwizard-example-server-galera-ha.kontena.local/example
+  url: jdbc:mysql://${DWSERVER_DB_HOST}-galera-ha.kontena.local/${DWSERVER_DB_NAME:-example}
 
 server:
   applicationConnectors:
