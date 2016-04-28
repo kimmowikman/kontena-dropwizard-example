@@ -22,22 +22,21 @@ galera-ha:
   image: kontena/lb:latest
   instances: 2
 
-dropwizard-example:
+dropwizard-server:
   image: wikman/dropwizard-example:1.0
   stateful: false
   instances: 2
   links:
-    - dropwizard-example-ha
+    - dropwizard-server-ha
   environment:
     - KONTENA_LB_MODE=http
-    - KONTENA_LB_BALANCE=source
-    - KONTENA_LB_INTERNAL_PORT=80
-    - KONTENA_LB_EXTERNAL_PORT=80
+    - KONTENA_LB_BALANCE=roundrobin
+    - KONTENA_LB_INTERNAL_PORT=8080
     - DWSERVER_DB_HOST=%{project}-galera-ha.kontena.local
     - DWSERVER_DB_NAME=example
 
-dropwizard-example-ha:
+dropwizard-server-ha:
   image: kontena/lb:latest
   instances: 2
   ports:
-  - "8080:8080"
+    - 80:80
